@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Program Sapa Nama</title>
+    <style>
+        /* ==========================================================================
+           1. RESET & UTALITAS DASAR (BACKGROUND & FONTS)
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #30031d 0%, #061118 50%, #0d283d 100%);
+            overflow: hidden;
+        }
+
+        /* ==========================================================================
+           2. KARTU UTAMA (CONTAINER)
+           ========================================================================== */
+        .card-container {
+            position: relative;
+            width: 90%;
+            max-width: 400px;
+            height: 500px;
+            background-color: rgba(26, 26, 26, 0.9);
+            border-radius: 40px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ==========================================================================
+           3. TAMPILAN ADEGAN 1 (INPUT / SAPA NAMA)
+           ========================================================================== */
+        .scene-1 {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .branding {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .sub-branding {
+            color: #aaaaaa;
+            font-size: 0.7rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .input-name {
+            width: 100%;
+            padding: 18px 25px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            color: #333;
+            background-color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .input-name::placeholder {
+            color: #999;
+        }
+
+        .btn-sapa {
+            width: 100%;
+            padding: 18px;
+            border-radius: 20px;
+            border: none;
+            background-color: #6c5ce7; 
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-sapa:hover {
+            background-color: #5b4cc4;
+        }
+
+        /* ==========================================================================
+           4. TAMPILAN ADEGAN 2 (ANIMASI HALO NAMA)
+           ========================================================================== */
+        .scene-2 {
+            position: absolute;
+            width: 100%;
+            padding: 0 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+            transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s; 
+        }
+
+        .greeting-text {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            word-break: break-word;
+        }
+
+        .animated-bar {
+            width: 0%; 
+            height: 55px;
+            background-color: #6c5ce7;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; 
+        }
+
+        .animated-bar:hover {
+            background-color: #5b4cc4;
+        }
+
+        .click-text {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease 0.5s, transform 0.4s ease 0.5s;
+        }
+
+        /* ==========================================================================
+           5. UTALITAS STATUS KELAS
+           ========================================================================== */
+        .hidden-scene {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+        }
+
+        .active-scene {
+            opacity: 1;
+            pointer-events: auto; 
+        }
+
+        .expand-bar {
+            width: 100%;
+        }
+
+        .show-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-container">
+        
+        <div class="scene-1" id="scene1">
+            <h1 class="branding">Ryudiz Emperor</h1>
+            <p class="sub-branding">BY HAMDIZ</p>
+            <h2 class="title">Program Sapa Nama</h2>
+            <input type="text" class="input-name" id="inputName" placeholder="Ketik nama kau..." autocomplete="off">
+            <button class="btn-sapa" id="btnSapa">Sapa</button>
+        </div>
+
+        <div class="scene-2" id="scene2">
+            <h2 class="greeting-text" id="greetingText">HALO {nama}</h2>
+            <div class="animated-bar" id="animatedBar">
+                <span class="click-text" id="clickText">CLICK</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. MENYIAPKAN SOUND EFFECT ---
+        // Silakan ganti 'click-sound.mp3' dengan nama file audio milikmu sendiri.
+        // Pastikan file audio berada dalam satu folder yang sama dengan file index.html ini.
+        const soundSapa = new Audio('sound efek.mp3'); 
+        const soundClickLink = new Audio('sound efek.mp3'); 
+
+        // Mengambil referensi elemen HTML
+        const btnSapa = document.getElementById('btnSapa');
+        const inputName = document.getElementById('inputName');
+        const scene1 = document.getElementById('scene1');
+        const scene2 = document.getElementById('scene2');
+        const greetingText = document.getElementById('greetingText');
+        const animatedBar = document.getElementById('animatedBar');
+        const clickText = document.getElementById('clickText');
+
+        // Logika ketika tombol "Sapa" di adegan 1 ditekan
+        btnSapa.addEventListener('click', function() {
+            const nameValue = inputName.value.trim();
+
+            if (nameValue === "") {
+                alert("Harap masukkan nama kamu terlebih dahulu!");
+                return;
+            }
+
+            // --- 2. MAINKAN SUARA SAAT TOMBOL SAPA DIKLIK ---
+            soundSapa.currentTime = 0; // Mengulang durasi audio dari awal (berguna jika diklik berkali-kali)
+            soundSapa.play();
+
+            greetingText.textContent = `HALO ${nameValue}`;
+            scene1.classList.add('hidden-scene');
+            scene2.classList.add('active-scene');
+
+            setTimeout(() => {
+                animatedBar.classList.add('expand-bar');
+            }, 400);
+
+            setTimeout(() => {
+                clickText.classList.add('show-text');
+            }, 900);
+        });
+
+        inputName.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                btnSapa.click();
+            }
+        });
+
+        // Logika ketika tombol "CLICK" di adegan 2 ditekan
+        animatedBar.addEventListener('click', function() {
+            const urlTujuan = "https://whatsapp.com/channel/0029VbCWjnh8aKvNQuzZhx2A"; 
+            
+            // --- 3. MAINKAN SUARA SAAT TOMBOL LINK DIKLIK ---
+            soundClickLink.currentTime = 0;
+            soundClickLink.play();
+
+            // Karena perpindahan halaman (redirect) berlangsung instan, kita beri jeda sedikit (300ms)
+            // agar efek suara sempat terdengar oleh user sebelum halaman benar-benar pindah.
+            setTimeout(() => {
+                window.location.href = urlTujuan;
+            }, 300); 
+        });
+    </script>
+</body>
+</html>
